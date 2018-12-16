@@ -1,0 +1,40 @@
+// GENERATED CODE -- DO NOT EDIT!
+{{- $Package:=.File.Package}}
+import {createTwirpRequest, throwTwirpError, Fetch} from "../twirp";
+import {
+{{range .File.MessageType}}{{.Name -}}, {{end}}
+} from "./service_pb";
+
+{{- range .File.Service}}
+export interface {{.Name}} {
+    {{- range .Method}}
+    {{.Name | lowerCamelCase}}: ({{.InputType | shortType | lowerCamelCase}}: {{.InputType | shortType}}) => Promise<{{.OutputType | shortType}}.AsObject>;
+    {{- end}}
+}
+
+export class Default{{.Name}} implements {{.Name}} {
+    private hostname: string;
+    private fetch: Fetch;
+    private token: string;
+    private pathPrefix = "/twirp/{{$Package}}.{{.Name}}/";
+
+    constructor(hostname: string, fetch: Fetch, token: string) {
+        this.hostname = hostname;
+        this.fetch = fetch;
+        this.token = token;
+    }
+
+    {{- range .Method}}
+    {{.Name | lowerCamelCase}}({{.InputType | shortType | lowerCamelCase}}: {{.InputType | shortType}}): Promise<{{.OutputType | shortType}}.AsObject> {
+        const url = this.hostname + this.pathPrefix + "{{.Name}}";
+        return this.fetch(createTwirpRequest(url, {{.InputType | shortType | lowerCamelCase}}.toObject(), this.token)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then((m): {{.OutputType | shortType}}.AsObject => m);
+        });
+    }
+    {{- end}}
+}
+{{- end}}

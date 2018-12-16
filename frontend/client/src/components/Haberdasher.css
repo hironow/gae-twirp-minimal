@@ -1,0 +1,16 @@
+.Haberdasher {
+    text-align: left;
+}
+
+.Haberdasher code {
+    font-size: 0.5em;
+    color: #e83e8c;
+    word-break: break-word;
+}
+
+.Haberdasher pre {
+    font-size: 0.7em;
+    overflow: scroll;
+    padding: 3px;
+    background-color: #eeeeee;
+}

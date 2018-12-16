@@ -1,0 +1,57 @@
+// GENERATED CODE -- DO NOT EDIT!
+{{- $Package:=.File.Package}}
+
+{{- range .File.Service}}
+namespace Pj.Protobuf.{{.Name}}Service {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using UnityEngine.Networking;
+    using Google.Protobuf;
+    using Pj.Protobuf.{{.Name}};
+    using System.Threading.Tasks;
+
+    public class Default{{.Name}} {
+        private readonly string hostName = "http://localhost:8080";
+        private readonly string token = "";
+        private readonly string pathPrefix = "/twirp/{{$Package}}.{{.Name}}/";
+
+        public Default{{.Name}}(string hn, string t) {
+            hostName = hn;
+            token = t;
+        }
+
+        {{- range .Method}}
+
+        public IEnumerator {{.Name}}({{.InputType | shortType}} {{.InputType | shortType | lowerCamelCase}}, TaskCompletionSource<{{.OutputType | shortType}}> taskCompletionSource) {
+            // バイナリデータでリクエスト
+            byte[] data = {{.InputType | shortType | lowerCamelCase}}.ToByteArray();
+            UnityWebRequest request = new UnityWebRequest(hostName + pathPrefix + "{{.Name}}", "POST");
+            if (data != null && data.Length != 0) {
+                request.uploadHandler = new UploadHandlerRaw(data);
+            }
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/protobuf");
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError) {
+                Debug.LogError(request.isNetworkError);
+                Debug.LogError(request.isHttpError);
+                Debug.LogError(request.error);
+
+                // TODO: エラーハンドリング、Twirpの型を定義しておかないといけない
+                // taskCompletionSource.TrySetException(new Exception(request.error));
+            }
+
+            // 結果をバイナリデータとして取得
+            byte[] result = request.downloadHandler.data;
+            {{.OutputType | shortType}} response = {{.OutputType | shortType}}.Parser.ParseFrom(result);
+            taskCompletionSource.TrySetResult(response);
+        }
+        {{- end}}
+    }
+}
+{{- end}}

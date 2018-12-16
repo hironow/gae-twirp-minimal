@@ -1,0 +1,11 @@
+service: frontend
+runtime: go
+api_version: go1.9
+
+handlers:
+- url: /static
+  static_dir: dist/static
+
+- url: /.*
+  script: _go_app
+  secure: always

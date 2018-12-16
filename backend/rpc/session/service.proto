@@ -1,0 +1,16 @@
+syntax = "proto3";
+package twitch.twirp.example.session;
+option go_package = "session";
+
+option csharp_namespace = "Pj.Protobuf.Session";
+
+service Session {
+    rpc Login(LoginRequest) returns (LoginResponse);
+}
+
+message LoginRequest {
+}
+
+message LoginResponse {
+    string token = 1;
+}
